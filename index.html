@@ -1,0 +1,424 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Bloomland — Social Chat Network</title>
+  <link rel="stylesheet" href="interlock.css">
+</head>
+<body>
+  <!-- Header/Navbar -->
+  <header class="topbar">
+    <button id="hamburger" class="hamburger" aria-label="Open menu">☰</button>
+    <div class="logo">🌸 Bloomland</div>
+    <div class="search-wrap">
+      <input id="search" placeholder="Search people, messages..." aria-label="Search">
+      <button id="searchClear" title="Clear">✕</button>
+    </div>
+    <div class="actions">
+      <button id="darkToggle" title="Toggle theme">🌓</button>
+      <button id="notifBtn" title="Notifications">🔔<span id="notifBadge" class="badge hidden">0</span></button>
+      <button id="profileMenu" title="User Menu">👤</button>
+    </div>
+  </header>
+
+  <!-- Sidebar Navigation -->
+  <aside id="sidenav" class="sidenav">
+    <div class="user-card">
+      <div class="avatar">👤</div>
+      <div class="user-info">
+        <div class="user-name">Your Profile</div>
+        <div class="user-status">Online</div>
+      </div>
+    </div>
+    <nav class="nav-menu">
+      <ul>
+        <li data-target="feed" class="active">
+          <span class="icon">📰</span>
+          <span>Feed</span>
+        </li>
+        <li data-target="reels">
+          <span class="icon">🎬</span>
+          <span>Reels</span>
+        </li>
+        <li data-target="messages">
+          <span class="icon">💬</span>
+          <span>Messages</span>
+          <span id="msgBadge" class="badge hidden">0</span>
+        </li>
+        <li data-target="live">
+          <span class="icon">🔴</span>
+          <span>Live Chat</span>
+        </li>
+        <li data-target="friends">
+          <span class="icon">👥</span>
+          <span>Friends</span>
+        </li>
+        <li data-target="groups">
+          <span class="icon">🏘️</span>
+          <span>Groups</span>
+        </li>
+        <li data-target="notifications">
+          <span class="icon">🔔</span>
+          <span>Notifications</span>
+          <span id="navNotif" class="badge hidden">0</span>
+        </li>
+        <li data-target="photos">
+          <span class="icon">🖼️</span>
+          <span>Photos</span>
+        </li>
+        <li data-target="market">
+          <span class="icon">🛍️</span>
+          <span>Market Hub</span>
+        </li>
+        <li data-target="settings">
+          <span class="icon">⚙️</span>
+          <span>Settings</span>
+        </li>
+      </ul>
+    </nav>
+    <button id="logoutBtn" class="logout-btn">Log Out</button>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main id="main" class="main-content">
+    <!-- Feed Section -->
+    <section id="feed" class="page active">
+      <div class="feed-container">
+        <!-- Post Creator -->
+        <div class="card post-creator">
+          <div class="creator-header">
+            <div class="avatar">👤</div>
+            <input id="postInput" placeholder="What's on your mind?" class="post-input">
+          </div>
+          <div class="creator-actions">
+            <button class="action-btn" id="postPhotoBtn" title="Add photo">📷 Photo</button>
+            <button class="action-btn" id="postVideoBtn" title="Add video">🎥 Video</button>
+            <button class="action-btn" id="postEmojiBtn" title="Add emoji">😊 Feeling</button>
+            <button id="postBtn" class="post-btn primary-btn">Post</button>
+          </div>
+          <input type="file" id="photoFileInput" accept="image/*" style="display:none;">
+          <input type="file" id="videoFileInput" accept="video/*" style="display:none;">
+          <div id="postPreview" class="post-preview" style="display:none; margin-top: 12px;">
+            <img id="photoPreview" style="max-width: 100%; max-height: 200px; border-radius: 8px; display:none;">
+            <video id="videoPreview" style="max-width: 100%; max-height: 200px; border-radius: 8px; display:none;" controls></video>
+            <button type="button" id="clearPreviewBtn" class="small-btn" style="margin-top: 8px;">Clear Media</button>
+          </div>
+        </div>
+
+        <!-- Feed Posts -->
+        <div id="feedContainer" class="feed-posts">
+          <!-- Posts will be inserted here -->
+        </div>
+      </div>
+
+      <!-- Right Sidebar - Online Friends -->
+      <aside class="feed-sidebar">
+        <div class="card">
+          <h4 class="card-title">Online Friends</h4>
+          <ul id="onlineFriends" class="friends-list">
+            <!-- Friends list will be populated here -->
+          </ul>
+        </div>
+      </aside>
+    </section>
+
+    <!-- Reels Section -->
+    <section id="reels" class="page">
+      <div class="page-header">
+        <h2>Reels</h2>
+        <button id="createReelBtn" class="primary-btn">+ Create Reel</button>
+      </div>
+      <div id="reelsGrid" class="reels-grid">
+        <!-- Reels will be displayed here -->
+      </div>
+    </section>
+
+    <!-- Messages Section -->
+    <section id="messages" class="page">
+      <div class="messages-container">
+        <!-- Chat List -->
+        <div class="chat-list">
+          <div class="chat-list-header">
+            <h3>Messages</h3>
+            <button id="newChatBtn" title="New Message">➕</button>
+          </div>
+          <div class="search-chats">
+            <input id="chatSearch" placeholder="Search conversations..." aria-label="Search chats">
+          </div>
+          <ul id="conversationsList" class="conversations">
+            <!-- Conversations will be listed here -->
+          </ul>
+        </div>
+
+        <!-- Chat Window -->
+        <div class="chat-window">
+          <div id="chatHeader" class="chat-header">
+            <div class="chat-user-info">
+              <div class="avatar-lg">👤</div>
+              <div>
+                <div id="chatUserName" class="chat-user-name">Select a conversation</div>
+                <div id="chatUserStatus" class="chat-user-status">offline</div>
+              </div>
+            </div>
+            <div class="chat-actions">
+              <button title="Call">☎️</button>
+              <button title="Video Call">📹</button>
+              <button title="Info">ℹ️</button>
+            </div>
+          </div>
+
+          <div id="messagesArea" class="messages-area" role="log" aria-live="polite">
+            <!-- Messages will appear here -->
+          </div>
+
+          <div class="chat-input-area">
+            <div class="input-actions">
+              <button title="Emoji">😊</button>
+              <button title="Attachment">📎</button>
+            </div>
+            <input id="messageInput" placeholder="Type a message..." class="message-input" aria-label="Message input">
+            <button id="sendMessageBtn" class="send-btn" title="Send">➤</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Live Chat Section -->
+    <section id="live" class="page">
+      <div class="page-header">
+        <h2>🔴 Live Chat</h2>
+      </div>
+      <div class="live-chat-container">
+        <div id="liveMessages" class="live-messages" role="log" aria-live="polite">
+          <!-- Live messages will appear here -->
+        </div>
+        <div class="live-chat-input">
+          <input id="liveMessageInput" placeholder="Say something..." class="message-input" aria-label="Live message input">
+          <button id="sendLiveBtn" class="send-btn" title="Send">➤</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Friends Section -->
+    <section id="friends" class="page">
+      <div class="page-header">
+        <h2>Friends</h2>
+        <input id="friendSearch" placeholder="Search friends..." class="search-box">
+      </div>
+      <div id="friendsGrid" class="friends-grid">
+        <!-- Friends will be displayed here -->
+      </div>
+    </section>
+
+    <!-- Groups Section -->
+    <section id="groups" class="page">
+      <div class="page-header">
+        <h2>Groups</h2>
+        <button id="createGroupBtn" class="primary-btn">+ Create Group</button>
+      </div>
+      <div id="groupsGrid" class="groups-grid">
+        <!-- Groups will be displayed here -->
+      </div>
+    </section>
+
+    <!-- Notifications Section -->
+    <section id="notifications" class="page">
+      <div class="page-header">
+        <h2>Notifications</h2>
+        <button id="markAllRead" class="small-btn">Mark all as read</button>
+      </div>
+      <ul id="notificationsList" class="notifications-list">
+        <!-- Notifications will be displayed here -->
+      </ul>
+    </section>
+
+    <!-- Photos Section -->
+    <section id="photos" class="page">
+      <div class="page-header">
+        <h2>Your Photos</h2>
+        <button id="uploadPhotoBtn" class="primary-btn">+ Upload Photo</button>
+      </div>
+      <div id="photosGrid" class="photos-grid">
+        <!-- Photos will be displayed here -->
+      </div>
+    </section>
+
+    <!-- Market Hub Section -->
+    <section id="market" class="page">
+      <div class="page-header">
+        <h2>🛍️ Market Hub</h2>
+        <a href="market.html" class="primary-btn" style="text-decoration: none; display: inline-block;">🌿 Open Bloomland Marketplace</a>
+      </div>
+      <div class="market-container">
+        <div class="card" style="text-align: center; padding: 60px 20px;">
+          <div style="font-size: 64px; margin-bottom: 20px;">🌸</div>
+          <h3 style="font-size: 24px; margin-bottom: 15px;">Welcome to Bloomland Market</h3>
+          <p style="color: var(--text-light); margin-bottom: 30px; font-size: 16px;">
+            Discover fresh flowers, beautiful plants, and quality seeds from local growers and sellers.
+          </p>
+          <p style="color: var(--text-light); margin-bottom: 30px;">
+            Browse thousands of products, manage your cart, and checkout securely.
+          </p>
+          <a href="market.html" class="primary-btn" style="text-decoration: none; padding: 12px 30px; font-size: 16px; display: inline-block;">
+            🚀 Launch Full Marketplace
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Settings Section -->
+    <section id="settings" class="page">
+      <div class="settings-container">
+        <div class="page-header">
+          <h2>Settings</h2>
+        </div>
+
+        <div class="settings-content">
+          <aside class="settings-menu">
+            <ul>
+              <li data-settings="general" class="active">General</li>
+              <li data-settings="privacy">Privacy</li>
+              <li data-settings="notifications">Notifications</li>
+              <li data-settings="appearance">Appearance</li>
+              <li data-settings="account">Account</li>
+            </ul>
+          </aside>
+
+          <div class="settings-main">
+            <!-- General Settings -->
+            <div id="general" class="settings-section active">
+              <h3>General Settings</h3>
+              <div class="card">
+                <label class="setting-item">
+                  <span>Full Name</span>
+                  <input id="settingName" type="text" value="Your Name">
+                </label>
+                <label class="setting-item">
+                  <span>Email</span>
+                  <input id="settingEmail" type="email" value="your@email.com">
+                </label>
+                <label class="setting-item">
+                  <span>Bio</span>
+                  <textarea id="settingBio" placeholder="Tell us about yourself..."></textarea>
+                </label>
+                <button id="saveGeneralBtn" class="primary-btn">Save Changes</button>
+              </div>
+            </div>
+
+            <!-- Privacy Settings -->
+            <div id="privacy" class="settings-section">
+              <h3>Privacy & Safety</h3>
+              <div class="card">
+                <label class="setting-item checkbox">
+                  <input id="privatProfile" type="checkbox">
+                  <span>Private Account</span>
+                </label>
+                <label class="setting-item checkbox">
+                  <input id="allowMessages" type="checkbox" checked>
+                  <span>Allow messages from anyone</span>
+                </label>
+                <label class="setting-item checkbox">
+                  <input id="showOnline" type="checkbox" checked>
+                  <span>Show online status</span>
+                </label>
+                <button id="savePrivacyBtn" class="primary-btn">Save Changes</button>
+              </div>
+            </div>
+
+            <!-- Notification Settings -->
+            <div id="notifications-settings" class="settings-section">
+              <h3>Notification Preferences</h3>
+              <div class="card">
+                <label class="setting-item checkbox">
+                  <input id="notifMessages" type="checkbox" checked>
+                  <span>Messages</span>
+                </label>
+                <label class="setting-item checkbox">
+                  <input id="notifFriendRequests" type="checkbox" checked>
+                  <span>Friend Requests</span>
+                </label>
+                <label class="setting-item checkbox">
+                  <input id="notifComments" type="checkbox" checked>
+                  <span>Comments & Likes</span>
+                </label>
+                <label class="setting-item checkbox">
+                  <input id="notifEmail" type="checkbox">
+                  <span>Email Notifications</span>
+                </label>
+                <button id="saveNotifBtn" class="primary-btn">Save Changes</button>
+              </div>
+            </div>
+
+            <!-- Appearance Settings -->
+            <div id="appearance" class="settings-section">
+              <h3>Appearance</h3>
+              <div class="card">
+                <label class="setting-item checkbox">
+                  <input id="darkModeToggle" type="checkbox">
+                  <span>Dark Mode</span>
+                </label>
+                <label class="setting-item">
+                  <span>Theme Color</span>
+                  <select id="themeColor">
+                    <option value="default">Default</option>
+                    <option value="blue">Blue</option>
+                    <option value="pink">Pink</option>
+                    <option value="green">Green</option>
+                  </select>
+                </label>
+                <button id="saveAppearanceBtn" class="primary-btn">Save Changes</button>
+              </div>
+            </div>
+
+            <!-- Account Settings -->
+            <div id="account" class="settings-section">
+              <h3>Account</h3>
+              <div class="card">
+                <p>Manage your account security and data</p>
+                <button id="changePasswordBtn" class="outline-btn">Change Password</button>
+                <button id="downloadDataBtn" class="outline-btn">Download Your Data</button>
+                <button id="deleteAccountBtn" class="danger-btn">Delete Account</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Modal -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-content">
+      <button id="modalClose" class="modal-close">✕</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <!-- Bottom Menu Bar -->
+  <nav class="bottom-menu">
+    <button class="bottom-menu-item" data-target="messages" title="Chat">
+      <span class="icon">💬</span>
+      <span class="label">Chat</span>
+    </button>
+    <button class="bottom-menu-item" data-target="reels" title="Reels">
+      <span class="icon">🎬</span>
+      <span class="label">Reels</span>
+    </button>
+    <button class="bottom-menu-item" data-target="market" title="Market Hub">
+      <span class="icon">🛍️</span>
+      <span class="label">Market</span>
+    </button>
+    <button class="bottom-menu-item" data-target="notifications" title="Notifications">
+      <span class="icon">🔔</span>
+      <span class="label">Alerts</span>
+    </button>
+    <button class="bottom-menu-item" data-target="settings" title="Profile">
+      <span class="icon">👤</span>
+      <span class="label">Profile</span>
+    </button>
+  </nav>
+
+  <script src="interlock.js"></script>
+</body>
+</html>

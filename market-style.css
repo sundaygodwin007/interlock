@@ -1,0 +1,249 @@
+/* Bloomland Market - Additional Styles */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.absolute {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #888;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    header {
+        position: sticky;
+    }
+    
+    .w-64 {
+        width: 100% !important;
+        margin-bottom: 20px;
+    }
+    
+    .flex.gap-4 {
+        flex-direction: column !important;
+    }
+}
+
+/* Product card hover effects */
+.bg-white.rounded-lg {
+    transition: all 0.3s ease;
+}
+
+.bg-white.rounded-lg:hover {
+    transform: translateY(-4px);
+}
+
+/* Button transitions */
+button {
+    transition: all 0.2s ease;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+/* Input focus states */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+input[type="range"],
+select,
+textarea {
+    transition: all 0.3s ease;
+}
+
+/* Checkbox and radio styling */
+input[type="checkbox"],
+input[type="radio"] {
+    cursor: pointer;
+    accent-color: #10b981;
+}
+
+/* Modal animations */
+.hidden {
+    display: none !important;
+}
+
+/* Add padding to modal content to prevent bottom menu overlap */
+#productModal .fixed.inset-0.bg-white {
+    padding-bottom: 100px;
+}
+
+#checkoutModal .fixed.inset-0.bg-white {
+    padding-bottom: 100px;
+}
+
+#advertiseModal .fixed.inset-0.bg-white {
+    padding-bottom: 100px;
+}
+
+/* Ensure modal content areas have bottom padding */
+#productModal > div,
+#checkoutModal > div,
+#advertiseModal > div {
+    padding-bottom: 100px;
+}
+
+#productModal.hidden,
+#advertiseModal.hidden,
+#cartSidebar.hidden,
+#checkoutModal.hidden {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+}
+
+#productModal:not(.hidden),
+#advertiseModal:not(.hidden),
+#cartSidebar:not(.hidden),
+#checkoutModal:not(.hidden) {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease;
+}
+
+/* Cart sidebar animation */
+#cartSidebar:not(.hidden) .absolute {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Loading and success animations */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Gradient text */
+.bg-gradient-to-r {
+    background-image: linear-gradient(to right, rgb(22, 163, 74), rgb(16, 185, 129));
+}
+
+.bg-clip-text {
+    background-clip: text;
+    -webkit-background-clip: text;
+}
+
+.text-transparent {
+    color: transparent;
+}
+
+/* Focus visible for accessibility */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+    outline: 2px solid #10b981;
+    outline-offset: 2px;
+}
+
+/* Smooth transitions for all elements */
+* {
+    transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow;
+    transition-timing-function: ease;
+    transition-duration: 150ms;
+}
+
+/* Disable transitions during navigation */
+button[onclick],
+a {
+    transition: none;
+}
+
+/* Bottom Menu for Market */
+.bottom-menu-market {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: white;
+    border-top: 1px solid #e5e7eb;
+    box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 99;
+    padding: 8px 0;
+}
+
+.bottom-menu-item-market {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #65676b;
+    transition: color 0.2s, background 0.2s;
+    border-radius: 8px;
+    flex: 1;
+    font-size: 12px;
+    text-decoration: none;
+}
+
+.bottom-menu-item-market:hover {
+    color: #10b981;
+    background: #f0f2f5;
+}
+
+.bottom-menu-item-market .icon {
+    font-size: 24px;
+    display: block;
+}
+
+.bottom-menu-item-market .label {
+    font-size: 11px;
+    font-weight: 500;
+}

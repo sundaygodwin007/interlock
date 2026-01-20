@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bloomland Market</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./market-style.css">
+</head>
+<body>
+    <div id="root" class="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
+        <!-- Header -->
+        <header class="bg-white shadow-md fixed top-0 left-0 right-0 z-40">
+            <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-3 sm:py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-2xl">🌿</span>
+                        <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
+                            Bloomland
+                        </h1>
+                    </div>
+                    
+                    <div class="flex items-center space-x-2 sm:space-x-3">
+                           <a href="index.html" class="text-2xl hover:scale-110 transition-transform" title="Back to Interlock">🔙</a>
+                        <button id="sellBtn"
+                            class="bg-emerald-600 text-white px-2 sm:px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors flex items-center space-x-1 sm:space-x-2 text-sm sm:text-base"
+                        >
+                            <span>📤</span>
+                            <span class="hidden sm:inline">Sell Product</span>
+                            <span class="sm:hidden">Sell</span>
+                        </button>
+                        
+                        <button id="cartBtn"
+                            class="relative bg-green-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-1 sm:space-x-2"
+                        >
+                            <span>🛒</span>
+                            <span class="hidden sm:inline font-medium">Cart</span>
+                            <span id="cartCount" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 sm:w-6 sm:h-6 flex items-center justify-center text-xs font-bold hidden">0</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-3 sm:mt-4 relative">
+                    <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">🔍</span>
+                    <input
+                        id="searchInput"
+                        type="text"
+                        placeholder="Search for flowers, plants, seeds..."
+                        class="w-full pl-9 sm:pl-10 pr-4 py-2 sm:py-3 text-sm sm:text-base border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none transition-colors"
+                    />
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="pt-28 sm:pt-32 md:pt-36 lg:pt-40 pb-24">
+            <div class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-6">
+                <div class="flex gap-4 lg:gap-6">
+                    <!-- Filters Sidebar -->
+                    <div class="w-64">
+                        <div class="sticky top-24 space-y-4">
+                            <!-- Categories -->
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <h3 class="font-bold text-lg mb-3 text-gray-800">Categories</h3>
+                                <div id="categoriesContainer" class="space-y-2"></div>
+                            </div>
+
+                            <!-- Sort By -->
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <h3 class="font-bold text-lg mb-3 text-gray-800">Sort By</h3>
+                                <select id="sortSelect"
+                                    class="w-full px-3 py-2 border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none"
+                                >
+                                    <option value="name">Name (A-Z)</option>
+                                    <option value="price-low">Price (Low to High)</option>
+                                    <option value="price-high">Price (High to Low)</option>
+                                    <option value="rating">Highest Rated</option>
+                                </select>
+                            </div>
+
+                            <!-- Price Range -->
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <h3 class="font-bold text-lg mb-3 text-gray-800">Price Range</h3>
+                                <div class="space-y-2">
+                                    <input id="priceRange"
+                                        type="range"
+                                        min="0"
+                                        max="100"
+                                        value="100"
+                                        class="w-full"
+                                    />
+                                    <div class="flex justify-between text-sm text-gray-600">
+                                        <span>$<span id="minPrice">0</span></span>
+                                        <span>$<span id="maxPrice">100</span></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Products Grid -->
+                    <main class="flex-1 min-w-0">
+                        <div id="productCountDiv" class="mb-3 sm:mb-4 text-sm sm:text-base text-gray-600">
+                            Found 0 products
+                        </div>
+                        
+                        <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6"></div>
+
+                        <div id="noResults" class="hidden text-center py-12 bg-white rounded-lg shadow-md">
+                            <p class="text-gray-500 text-base sm:text-lg">No products found matching your criteria</p>
+                        </div>
+                    </main>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Detail Modal -->
+        <div id="productModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto">
+            <div class="min-h-screen px-3 sm:px-4 py-4 sm:py-8 flex items-start sm:items-center justify-center">
+                <div class="bg-white rounded-lg shadow-2xl max-w-4xl w-full my-4">
+                    <div class="p-4 sm:p-6 border-b flex justify-between items-center">
+                        <h2 id="productModalTitle" class="text-xl sm:text-2xl font-bold text-gray-800"></h2>
+                        <button class="closeProductModal text-gray-500 hover:text-gray-700 text-2xl">×</button>
+                    </div>
+
+                    <div class="p-4 sm:p-6">
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <!-- Left Column - Images -->
+                            <div>
+                                <div class="bg-gradient-to-br from-green-100 to-emerald-100 rounded-lg p-12 sm:p-16 flex items-center justify-center mb-4">
+                                    <span id="productMainImage" class="text-9xl sm:text-9xl">🌹</span>
+                                </div>
+                                
+                                <div id="productThumbnails" class="grid grid-cols-4 gap-2"></div>
+                            </div>
+
+                            <!-- Right Column - Details -->
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <span id="productCategoryBadge" class="inline-block bg-green-100 text-green-800 text-sm px-3 py-1 rounded-full font-medium"></span>
+                                    <div class="flex items-center space-x-2">
+                                        <span class="text-yellow-500 text-xl">★</span>
+                                        <span id="productRating" class="text-lg font-bold">4.5</span>
+                                        <span id="productReviews" class="text-gray-500 text-sm">(0 reviews)</span>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <p id="productPrice" class="text-4xl font-bold text-green-600 mb-2">$0</p>
+                                    <p id="productStock" class="text-sm text-gray-600"></p>
+                                </div>
+
+                                <div class="border-t pt-4">
+                                    <h3 class="font-bold text-lg mb-2 text-gray-800">Description</h3>
+                                    <p id="productDescription" class="text-gray-700 leading-relaxed"></p>
+                                </div>
+
+                                <div class="border-t pt-4">
+                                    <h3 class="font-bold text-lg mb-2 text-gray-800">Product Details</h3>
+                                    <p id="productDetails" class="text-gray-700 leading-relaxed text-sm"></p>
+                                </div>
+
+                                <div class="border-t pt-4">
+                                    <h3 class="font-bold text-lg mb-3 text-gray-800">Features</h3>
+                                    <ul class="space-y-2 text-sm text-gray-700">
+                                        <li class="flex items-start">✓ <span class="ml-2">Premium quality guarantee</span></li>
+                                        <li class="flex items-start">✓ <span class="ml-2">Fast and secure delivery</span></li>
+                                        <li class="flex items-start">✓ <span class="ml-2">30-day satisfaction guarantee</span></li>
+                                        <li class="flex items-start">✓ <span class="ml-2">Expert customer support</span></li>
+                                    </ul>
+                                </div>
+
+                                <div class="flex gap-3 pt-4">
+                                    <button id="addToCartFromModal"
+                                        class="flex-1 bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors font-bold text-lg flex items-center justify-center space-x-2"
+                                    >
+                                        <span>🛒</span>
+                                        <span>Add to Cart</span>
+                                    </button>
+                                    <button id="buyNowFromModal"
+                                        class="flex-1 bg-emerald-600 text-white py-3 px-6 rounded-lg hover:bg-emerald-700 transition-colors font-bold text-lg"
+                                    >
+                                        Buy Now
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Advertise Modal -->
+        <div id="advertiseModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto">
+            <div class="min-h-screen px-3 sm:px-4 py-4 sm:py-8 flex items-start sm:items-center justify-center">
+                <div class="bg-white rounded-lg shadow-2xl max-w-4xl w-full my-4">
+                    <div id="advertiseForm" class="block">
+                        <div class="p-4 sm:p-6 border-b">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h2 class="text-xl sm:text-2xl font-bold text-gray-800">Advertise Your Product</h2>
+                                    <p class="text-sm text-gray-600 mt-1">Reach thousands of customers on Bloomland</p>
+                                </div>
+                                <button class="closeAdvertiseModal text-gray-500 hover:text-gray-700 text-2xl">×</button>
+                            </div>
+                        </div>
+
+                        <div class="p-4 sm:p-6 max-h-[70vh] overflow-y-auto">
+                            <form id="advertiseFormElement">
+                                <div class="grid md:grid-cols-2 gap-6 sm:gap-8">
+                                    <div class="space-y-4 sm:space-y-6">
+                                        <!-- Product Details -->
+                                        <div>
+                                            <div class="flex items-center space-x-2 mb-3 sm:mb-4">
+                                                <span>📤</span>
+                                                <h3 class="text-base sm:text-lg font-bold text-gray-800">Product Details</h3>
+                                            </div>
+                                            
+                                            <div class="space-y-2 sm:space-y-3">
+                                                <input type="text" name="productName" placeholder="Product Name *" class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border-2 border-gray-200 rounded-lg focus:border-emerald-500 focus:outline-none" required/>
+                                                
+                                                <select name="category" class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border-2 border-gray-200 rounded-lg focus:border-emerald-500 focus:outline-none">
+                                                    <option value="Flowers">Flowers</option>
+                                                    <option value="Plants">Plants</option>
+                                                    <option value="Seeds">Seeds</option>
+                                                    <option value="Clothes">Clothes</option>
+                                                </select>
+                                                
+                                                <input type="number" name="price" placeholder="Price (USD) *" step="0.01" min="0" class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border-2 border-gray-200 rounded-lg focus:border-emerald-500 focus:outline-none" required/>
+                                                
+                                                <textarea name="description" placeholder="Product Description *" rows="3" class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border-2 border-gray-200 rounded-lg focus:border-emerald-500 focus:outline-none resize-none" required></textarea>
+                                                
+                                                <input type="number" name="stock" placeholder="Stock Quantity *" min="1" class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border-2 border-gray-200 rounded-lg focus:border-emerald-500 focus:outline-none" required/>
+                                            </div>
+                                        </div>
+
+                                        <!-- Seller Information -->
+                                        <div>
+                                            <div class="flex items-center space-x-2 mb-3 sm:mb-4">
+                                                <span>📍</span>
+                                                <h3 class="text-base sm:text-lg font-bold text-gray-800">Seller Information</h3>
+                                            </div>
+                                            
+                                            <div class="space-y-2 sm:space-y-3">
+                                                <input type="text" name="sellerName" placeholder="Your Full Name *" class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border-2 border-gray-200 rounded-lg focus:border-emerald-500 focus:outline-none" required/>
+                                                
+                                                <input type="email" name="sellerEmail" placeholder="Email Address *" class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border-2 border-gray-200 rounded-lg focus:border-emerald-500 focus:outline-none" required/>
+                                                
+                                                <input type="tel" name="sellerPhone" placeholder="Phone Number *" class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border-2 border-gray-200 rounded-lg focus:border-emerald-500 focus:outline-none" required/>
+                                            </div>
+                                        </div>
+
+                                        <!-- Payment Information -->
+                                        <div>
+                                            <div class="flex items-center space-x-2 mb-3 sm:mb-4">
+                                                <span>💳</span>
+                                                <h3 class="text-base sm:text-lg font-bold text-gray-800">Payment Information</h3>
+                                            </div>
+                                            
+                                            <div class="space-y-2 sm:space-y-3">
+                                                <input type="text" name="cardNumber" placeholder="Card Number *" maxlength="16" class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border-2 border-gray-200 rounded-lg focus:border-emerald-500 focus:outline-none" required/>
+                                                
+                                                <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                                                    <input type="text" name="expiryDate" placeholder="MM/YY *" maxlength="5" class="px-3 sm:px-4 py-2 text-sm sm:text-base border-2 border-gray-200 rounded-lg focus:border-emerald-500 focus:outline-none" required/>
+                                                    
+                                                    <input type="text" name="cvv" placeholder="CVV *" maxlength="3" class="px-3 sm:px-4 py-2 text-sm sm:text-base border-2 border-gray-200 rounded-lg focus:border-emerald-500 focus:outline-none" required/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Plan & Summary -->
+                                    <div>
+                                        <div class="bg-emerald-50 rounded-lg p-4 sm:p-6 md:sticky md:top-0">
+                                            <div class="flex items-center space-x-2 mb-3 sm:mb-4">
+                                                <span>💰</span>
+                                                <h3 class="text-base sm:text-lg font-bold text-gray-800">Advertisement Plan</h3>
+                                            </div>
+                                            
+                                            <div class="space-y-3 mb-4">
+                                                <label class="flex items-center justify-between p-3 border-2 rounded-lg cursor-pointer hover:bg-white transition-colors">
+                                                    <div class="flex items-center space-x-3">
+                                                        <input type="radio" name="adDuration" value="7" class="w-4 h-4 text-emerald-600"/>
+                                                        <div>
+                                                            <p class="font-medium text-sm sm:text-base">7 Days</p>
+                                                            <p class="text-xs text-gray-500">Short-term promotion</p>
+                                                        </div>
+                                                    </div>
+                                                    <p class="font-bold text-emerald-600">$19.99</p>
+                                                </label>
+                                                
+                                                <label class="flex items-center justify-between p-3 border-2 border-emerald-300 rounded-lg cursor-pointer bg-white transition-colors">
+                                                    <div class="flex items-center space-x-3">
+                                                        <input type="radio" name="adDuration" value="30" checked class="w-4 h-4 text-emerald-600"/>
+                                                        <div>
+                                                            <p class="font-medium text-sm sm:text-base">30 Days</p>
+                                                            <p class="text-xs text-gray-500">Most popular</p>
+                                                        </div>
+                                                    </div>
+                                                    <p class="font-bold text-emerald-600">$49.99</p>
+                                                </label>
+                                                
+                                                <label class="flex items-center justify-between p-3 border-2 rounded-lg cursor-pointer hover:bg-white transition-colors">
+                                                    <div class="flex items-center space-x-3">
+                                                        <input type="radio" name="adDuration" value="90" class="w-4 h-4 text-emerald-600"/>
+                                                        <div>
+                                                            <p class="font-medium text-sm sm:text-base">90 Days</p>
+                                                            <p class="text-xs text-gray-500">Best value</p>
+                                                        </div>
+                                                    </div>
+                                                    <p class="font-bold text-emerald-600">$129.99</p>
+                                                </label>
+                                            </div>
+
+                                            <div class="bg-white rounded-lg p-4 mb-4">
+                                                <h4 class="font-bold text-sm mb-2 text-gray-800">What You Get:</h4>
+                                                <ul class="text-xs sm:text-sm text-gray-600 space-y-1">
+                                                    <li>✓ Featured product listing</li>
+                                                    <li>✓ Priority in search results</li>
+                                                    <li>✓ Product analytics dashboard</li>
+                                                    <li>✓ Customer inquiry management</li>
+                                                    <li>✓ 24/7 seller support</li>
+                                                </ul>
+                                            </div>
+                                            
+                                            <div class="border-t pt-4 space-y-2">
+                                                <div class="flex justify-between text-sm sm:text-base text-gray-600">
+                                                    <span>Advertisement Fee:</span>
+                                                    <span id="adFee">$49.99</span>
+                                                </div>
+                                                
+                                                <div class="flex justify-between text-sm sm:text-base text-gray-600">
+                                                    <span>Processing Fee:</span>
+                                                    <span>$2.99</span>
+                                                </div>
+                                                
+                                                <div class="flex justify-between text-lg sm:text-xl font-bold text-gray-800 pt-2 border-t">
+                                                    <span>Total:</span>
+                                                    <span id="adTotal" class="text-emerald-600">$52.98</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <button type="submit" class="w-full mt-4 sm:mt-6 bg-emerald-600 text-white py-2.5 sm:py-3 rounded-lg hover:bg-emerald-700 transition-colors font-bold text-base sm:text-lg">
+                                                Publish Product
+                                            </button>
+                                            
+                                            <button type="button" class="closeAdvertiseModal w-full mt-2 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition-colors text-sm sm:text-base">
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div id="advertiseComplete" class="hidden p-6 sm:p-12 text-center">
+                        <div class="mb-4 sm:mb-6">
+                            <span class="text-6xl sm:text-8xl inline-block animate-pulse">✅</span>
+                        </div>
+                        
+                        <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">Product Published!</h2>
+                        
+                        <p id="advertiseThankYou" class="text-sm sm:text-base text-gray-600 mb-2">Thank you!</p>
+                        <p id="advertiseProductName" class="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">Your product is now live on Bloomland</p>
+                        
+                        <div class="bg-emerald-50 rounded-lg p-4 sm:p-6 mb-4 sm:mb-6 max-w-md mx-auto">
+                            <p id="advertiseListingId" class="text-sm sm:text-base text-gray-700 mb-2">Listing ID: <span class="font-bold"></span></p>
+                            <p id="advertiseDuration" class="text-sm sm:text-base text-gray-700 mb-2">Duration: <span class="font-bold"></span></p>
+                            <p id="advertisePaid" class="text-sm sm:text-base text-gray-700">Amount Paid: <span class="font-bold text-emerald-600"></span></p>
+                        </div>
+                        
+                        <div id="advertiseEmail" class="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">
+                            <p>Confirmation email sent to:</p>
+                            <p class="font-medium"></p>
+                        </div>
+                        
+                        <p class="text-gray-500 text-xs sm:text-sm">Your product will appear in search results within 24 hours</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shopping Cart Sidebar -->
+        <div id="cartSidebar" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50">
+            <div class="absolute right-0 top-0 h-full w-full sm:w-96 md:w-[28rem] bg-white shadow-2xl overflow-y-auto transition-transform duration-300">
+                <div class="p-4 sm:p-6">
+                    <div class="flex justify-between items-center mb-4 sm:mb-6">
+                        <h2 class="text-xl sm:text-2xl font-bold text-gray-800">Shopping Cart</h2>
+                        <button class="closeCart text-gray-500 hover:text-gray-700 text-2xl">×</button>
+                    </div>
+
+                    <div id="emptyCart" class="text-center py-12">
+                        <div class="text-4xl mb-4">🛒</div>
+                        <p class="text-gray-500">Your cart is empty</p>
+                    </div>
+
+                    <div id="cartContent" class="hidden">
+                        <div id="cartItems" class="space-y-3 sm:space-y-4 mb-4 sm:mb-6"></div>
+
+                        <div class="border-t pt-4">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-base sm:text-lg font-bold text-gray-800">Total:</span>
+                                <span id="cartTotal" class="text-xl sm:text-2xl font-bold text-green-600">$0.00</span>
+                            </div>
+                            
+                            <button id="checkoutBtn"
+                                class="w-full bg-green-600 text-white py-2.5 sm:py-3 rounded-lg hover:bg-green-700 transition-colors font-bold text-base sm:text-lg"
+                            >
+                                Proceed to Checkout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Checkout Modal -->
+        <div id="checkoutModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 overflow-y-auto">
+            <div class="min-h-screen px-3 sm:px-4 py-4 sm:py-8 flex items-start sm:items-center justify-center">
+                <div class="bg-white rounded-lg shadow-2xl max-w-4xl w-full my-4">
+                    <div id="checkoutForm" class="block">
+                        <div class="p-4 sm:p-6 border-b">
+                            <div class="flex justify-between items-center">
+                                <h2 class="text-xl sm:text-2xl font-bold text-gray-800">Checkout</h2>
+                                <button class="closeCheckout text-gray-500 hover:text-gray-700 text-2xl">×</button>
+                            </div>
+                        </div>
+
+                        <div class="p-4 sm:p-6 max-h-[70vh] overflow-y-auto">
+                            <form id="checkoutFormElement">
+                                <div class="grid md:grid-cols-2 gap-6 sm:gap-8">
+                                    <div class="space-y-4 sm:space-y-6">
+                                        <!-- Shipping Information -->
+                                        <div>
+                                            <div class="flex items-center space-x-2 mb-3 sm:mb-4">
+                                                <span>📍</span>
+                                                <h3 class="text-base sm:text-lg font-bold text-gray-800">Shipping Information</h3>
+                                            </div>
+                                            
+                                            <div class="space-y-2 sm:space-y-3">
+                                                <input type="text" name="fullName" placeholder="Full Name *" class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none" required/>
+                                                
+                                                <input type="email" name="email" placeholder="Email Address *" class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none" required/>
+                                                
+                                                <input type="tel" name="phone" placeholder="Phone Number *" class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none" required/>
+                                                
+                                                <input type="text" name="address" placeholder="Street Address *" class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none" required/>
+                                                
+                                                <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                                                    <input type="text" name="city" placeholder="City *" class="px-3 sm:px-4 py-2 text-sm sm:text-base border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none" required/>
+                                                    
+                                                    <input type="text" name="state" placeholder="State *" class="px-3 sm:px-4 py-2 text-sm sm:text-base border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none" required/>
+                                                </div>
+                                                
+                                                <input type="text" name="zipCode" placeholder="ZIP Code *" class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none" required/>
+                                            </div>
+                                        </div>
+
+                                        <!-- Delivery Method -->
+                                        <div>
+                                            <div class="flex items-center space-x-2 mb-3 sm:mb-4">
+                                                <span>🚚</span>
+                                                <h3 class="text-base sm:text-lg font-bold text-gray-800">Delivery Method</h3>
+                                            </div>
+                                            
+                                            <div class="space-y-2">
+                                                <label class="flex items-center space-x-3 p-3 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                                    <input type="radio" name="deliveryOption" value="standard" checked class="w-4 h-4 text-green-600"/>
+                                                    <div class="flex-1">
+                                                        <p class="font-medium text-sm sm:text-base">Standard Delivery (5-7 days)</p>
+                                                        <p class="text-xs sm:text-sm text-gray-500">$5.99</p>
+                                                    </div>
+                                                </label>
+                                                
+                                                <label class="flex items-center space-x-3 p-3 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                                    <input type="radio" name="deliveryOption" value="express" class="w-4 h-4 text-green-600"/>
+                                                    <div class="flex-1">
+                                                        <p class="font-medium text-sm sm:text-base">Express Delivery (2-3 days)</p>
+                                                        <p class="text-xs sm:text-sm text-gray-500">$15.99</p>
+                                                    </div>
+                                                </label>
+                                                
+                                                <label class="flex items-center space-x-3 p-3 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+                                                    <input type="radio" name="deliveryOption" value="pickup" class="w-4 h-4 text-green-600"/>
+                                                    <div class="flex-1">
+                                                        <p class="font-medium text-sm sm:text-base">Store Pickup</p>
+                                                        <p class="text-xs sm:text-sm text-gray-500">Free</p>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </div>
+
+                                        <!-- Payment Information -->
+                                        <div>
+                                            <div class="flex items-center space-x-2 mb-3 sm:mb-4">
+                                                <span>💳</span>
+                                                <h3 class="text-base sm:text-lg font-bold text-gray-800">Payment Information</h3>
+                                            </div>
+                                            
+                                            <div class="space-y-2 sm:space-y-3">
+                                                <input type="text" name="cardNumber" placeholder="Card Number *" maxlength="16" class="w-full px-3 sm:px-4 py-2 text-sm sm:text-base border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none" required/>
+                                                
+                                                <div class="grid grid-cols-2 gap-2 sm:gap-3">
+                                                    <input type="text" name="expiryDate" placeholder="MM/YY *" maxlength="5" class="px-3 sm:px-4 py-2 text-sm sm:text-base border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none" required/>
+                                                    
+                                                    <input type="text" name="cvv" placeholder="CVV *" maxlength="3" class="px-3 sm:px-4 py-2 text-sm sm:text-base border-2 border-gray-200 rounded-lg focus:border-green-500 focus:outline-none" required/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Order Summary -->
+                                    <div>
+                                        <div class="bg-gray-50 rounded-lg p-4 sm:p-6 md:sticky md:top-0">
+                                            <div class="flex items-center space-x-2 mb-3 sm:mb-4">
+                                                <span>📦</span>
+                                                <h3 class="text-base sm:text-lg font-bold text-gray-800">Order Summary</h3>
+                                            </div>
+                                            
+                                            <div id="checkoutItems" class="space-y-2 sm:space-y-3 mb-3 sm:mb-4 max-h-48 sm:max-h-64 overflow-y-auto"></div>
+                                            
+                                            <div class="border-t pt-3 sm:pt-4 space-y-1.5 sm:space-y-2">
+                                                <div class="flex justify-between text-sm sm:text-base text-gray-600">
+                                                    <span>Subtotal:</span>
+                                                    <span id="subtotal">$0.00</span>
+                                                </div>
+                                                
+                                                <div class="flex justify-between text-sm sm:text-base text-gray-600">
+                                                    <span>Delivery:</span>
+                                                    <span id="deliveryCost">$5.99</span>
+                                                </div>
+                                                
+                                                <div class="flex justify-between text-sm sm:text-base text-gray-600">
+                                                    <span>Tax (8%):</span>
+                                                    <span id="taxAmount">$0.00</span>
+                                                </div>
+                                                
+                                                <div class="flex justify-between text-lg sm:text-xl font-bold text-gray-800 pt-2 border-t">
+                                                    <span>Total:</span>
+                                                    <span id="grandTotal" class="text-green-600">$0.00</span>
+                                                </div>
+                                            </div>
+                                            
+                                            <button type="submit" class="w-full mt-4 sm:mt-6 bg-green-600 text-white py-2.5 sm:py-3 rounded-lg hover:bg-green-700 transition-colors font-bold text-base sm:text-lg">
+                                                Complete Order
+                                            </button>
+                                            
+                                            <button type="button" class="closeCheckout w-full mt-2 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition-colors text-sm sm:text-base">
+                                                Back to Cart
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div id="orderComplete" class="hidden p-6 sm:p-12 text-center">
+                        <div class="mb-4 sm:mb-6">
+                            <span class="text-6xl sm:text-8xl inline-block animate-pulse">✅</span>
+                        </div>
+                        
+                        <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">Order Complete!</h2>
+                        
+                        <p id="orderThankYou" class="text-sm sm:text-base text-gray-600 mb-2">Thank you!</p>
+                        <p id="orderConfirmation" class="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">A confirmation email has been sent to <span class="font-medium"></span></p>
+                        
+                        <div class="bg-green-50 rounded-lg p-4 sm:p-6 mb-4 sm:mb-6 max-w-md mx-auto">
+                            <p id="orderNumber" class="text-sm sm:text-base text-gray-700 mb-2">Order Number: <span class="font-bold"></span></p>
+                            <p id="orderTotal" class="text-sm sm:text-base text-gray-700">Total Paid: <span class="font-bold text-green-600"></span></p>
+                        </div>
+                        
+                        <div id="orderAddress" class="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">
+                            <p>Your order will be delivered to:</p>
+                            <p class="font-medium"></p>
+                        </div>
+                        
+                        <p class="text-gray-500 text-xs sm:text-sm">Redirecting to home page...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Menu Bar -->
+    <nav class="bottom-menu-market">
+        <a href="index.html" class="bottom-menu-item-market" onclick="window.location.href='index.html'; return false;" title="Home">
+            <span class="icon">🏠</span>
+            <span class="label">Home</span>
+        </a>
+        <a href="index.html" class="bottom-menu-item-market" onclick="window.location.href='index.html'; return false;" data-target="messages" title="Chat">
+            <span class="icon">💬</span>
+            <span class="label">Chat</span>
+        </a>
+        <a href="index.html" class="bottom-menu-item-market" onclick="window.location.href='index.html'; return false;" data-target="reels" title="Reels">
+            <span class="icon">🎬</span>
+            <span class="label">Reels</span>
+        </a>
+        <a href="index.html#notifications" class="bottom-menu-item-market" onclick="window.location.href='index.html#notifications'; return false;" data-target="notifications" title="Notifications">
+            <span class="icon">🔔</span>
+            <span class="label">Alerts</span>
+        </a>
+        <a href="index.html" class="bottom-menu-item-market" onclick="window.location.href='index.html'; return false;" data-target="settings" title="Profile">
+            <span class="icon">👤</span>
+            <span class="label">Profile</span>
+        </a>
+    </nav>
+
+    <script src="market-script.js"></script>
+</body>
+</html>
