@@ -51,9 +51,9 @@ const samplePosts = [
 ];
 
 const sampleReels = [
-  { id: 1, author: 'Sarah', avatar: '👩‍🦰', video: 'data:video/mp4,', likes: 120, comments: 15, liked: false },
-  { id: 2, author: 'John', avatar: '👨‍💼', video: 'data:video/mp4,', likes: 89, comments: 12, liked: false },
-  { id: 3, author: 'Lisa', avatar: '👩‍💻', video: 'data:video/mp4,', likes: 156, comments: 28, liked: false }
+  { id: 1, author: 'Sarah', avatar: '👩‍🦰', video: 'data:video/mp4,', likes: 120, comments: [], commentCount: 15, liked: false },
+  { id: 2, author: 'John', avatar: '👨‍💼', video: 'data:video/mp4,', likes: 89, comments: [], commentCount: 12, liked: false },
+  { id: 3, author: 'Lisa', avatar: '👩‍💻', video: 'data:video/mp4,', likes: 156, comments: [], commentCount: 28, liked: false }
 ];
 
 const sampleConversations = [
@@ -506,7 +506,7 @@ function loadReelsGrid() {
               <button class="reel-action-btn" onclick="toggleReelLike(${reel.id})">
                 ${reel.liked ? '❤️' : '🤍'} ${reel.likes}
               </button>
-              <button class="reel-action-btn">💬 ${reel.comments}</button>
+              <button class="reel-action-btn" onclick="openReelComments(${reel.id})">💬 ${reel.commentCount + reel.comments.length}</button>
             </div>
           </div>
         </div>
@@ -521,6 +521,56 @@ function toggleReelLike(reelId) {
     reel.liked = !reel.liked;
     reel.likes += reel.liked ? 1 : -1;
     loadReelsGrid();
+  }
+}
+
+function openReelComments(reelId) {
+  const reel = sampleReels.find(r => r.id === reelId);
+  if (!reel) return;
+  
+  const modalBody = document.getElementById('modalBody');
+  modalBody.innerHTML = `
+    <div style="display: flex; flex-direction: column; gap: 12px; height: 400px;">
+      <h3>${reel.author}'s Reel Comments</h3>
+      <div style="flex: 1; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px; padding: 12px; background: #f9f9f9;">
+        <div id="reelCommentsList" style="display: flex; flex-direction: column; gap: 10px;">
+          ${reel.comments.length > 0 ? reel.comments.map(comment => `
+            <div style="background: white; padding: 8px; border-radius: 6px; border-left: 3px solid #10b981;">
+              <div style="font-weight: 500; font-size: 13px;">${comment.author}</div>
+              <div style="font-size: 13px; color: #555; margin-top: 4px;">${comment.text}</div>
+            </div>
+          `).join('') : '<p style="color: #999; text-align: center; padding: 20px;">No comments yet. Be the first to comment!</p>'}
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <input id="reelCommentInput" type="text" placeholder="Add a comment..." style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 6px;">
+        <button onclick="submitReelComment(${reelId})" style="padding: 10px 16px; background: #10b981; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">Post</button>
+      </div>
+    </div>
+  `;
+  showModal();
+  document.getElementById('reelCommentInput').focus();
+}
+
+function submitReelComment(reelId) {
+  const reel = sampleReels.find(r => r.id === reelId);
+  const input = document.getElementById('reelCommentInput');
+  const text = input.value.trim();
+  
+  if (!text) {
+    showNotification('Please enter a comment', 'error');
+    return;
+  }
+  
+  if (reel) {
+    reel.comments.push({
+      author: 'You',
+      text: text
+    });
+    input.value = '';
+    openReelComments(reelId);
+    loadReelsGrid();
+    showNotification('Comment posted! 💬', 'success');
   }
 }
 
